@@ -1,15 +1,21 @@
 package se.arvidbodkth.laboration3b;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+
+    private Button button;
+    private EditText editText;
+    private DataSender model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,14 +24,23 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+        button = (Button) findViewById(R.id.button);
+        editText = (EditText) findViewById(R.id.editText);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                BluetoothTask bluetoothTask = new BluetoothTask();
+                bluetoothTask.execute();
+
             }
         });
+
+    }
+
+    public void showToast(String msg) {
+        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     @Override
@@ -49,4 +64,47 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    private class BluetoothTask extends AsyncTask<Void,Void,String>{
+
+        @Override
+        protected String doInBackground(Void... params) {
+
+            //Hämta BL data
+
+            //Spara data
+
+            return "Testtes123";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            TcpTask tcpTask = new TcpTask();
+            tcpTask.execute(s);
+
+        }
+    }
+
+    private class TcpTask extends AsyncTask<String,Void,Void>{
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            DataSender dataSender = new DataSender(params[0]);
+            dataSender.sendData();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            System.out.println("TcpTask klar.");
+        }
+    }
 }
+
