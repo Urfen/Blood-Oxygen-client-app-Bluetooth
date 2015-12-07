@@ -2,16 +2,14 @@ package se.arvidbodkth.laboration3b;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,17 +20,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.text.ParseException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Set;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter = null;
     private BluetoothDevice noninDevice = null;
     private BluetoothIOTask bluetoothIOTask;
+
+    private String fileName = "theData";
 
 
     @Override
@@ -82,8 +80,6 @@ public class MainActivity extends AppCompatActivity {
             showToast("This device do not support Bluetooth");
             this.finish();
         }
-
-        dataFile = new File(getExternalFilesDir(null), "data.txt");
         dataArray = new ArrayList<>();
 
     }
@@ -110,30 +106,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onPollButtonClicked(View view) {
+
+        bluetoothIOTask = new BluetoothIOTask(this, noninDevice, getApplicationContext());
+        bluetoothIOTask.execute();
+
+
         if (noninDevice != null) {
-            bluetoothIOTask = new BluetoothIOTask(this, noninDevice, getApplicationContext());
-            bluetoothIOTask.execute();
+
         } else {
             showToast("No Nonin sensor found");
         }
     }
 
-
     public void onStopButtonClicked(View view) {
-        bluetoothIOTask.cancel(true);
-        try {
-            File file = new File(getExternalFilesDir(null), "data.txt");
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //bluetoothIOTask.cancel(true);
+
+        TcpTask tcpTask = new TcpTask();
+        tcpTask.execute(readFromFile());
 
     }
-
 
     protected void displayData(CharSequence data) {
         dataView.append(data);
@@ -142,19 +133,54 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void writeToFile() {
-        if(dataArray.size() < 0) {
+        if (dataArray.size() > 0) {
+            PrintWriter writer = null;
+            deleteFile(fileName);
             try {
-                BufferedWriter buffer = new BufferedWriter(new FileWriter(dataFile));
-
-                for (int i = 0; i < dataArray.size()-1; i++) {
-                    buffer.append(dataArray.get(i));
+                OutputStream os = this.openFileOutput(fileName, MODE_APPEND);
+                writer = new PrintWriter(os);
+                writer.println(new Date().toString() + ";");
+                for (int i = 0; i < dataArray.size() ; i++) {
+                    writer.println(dataArray.get(i) + ";");
                 }
-
-                buffer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            } finally {
+                if (writer != null) writer.close();
             }
         }
+    }
+
+    /**
+     * Reads the data from the local file then updates the
+     * arraylist and spinners with the data.
+     */
+    private String readFromFile() {
+        String data = "";
+        //Empty the list for the new data.
+        BufferedReader reader = null;
+        try {
+            InputStream is = this.openFileInput(fileName);
+            reader = new BufferedReader(new InputStreamReader(is));
+            String line = reader.readLine();
+
+            while (line != null) {
+                data += line;
+                System.out.println(line);
+                line = reader.readLine();
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        //If the date-parsing fails.
+        finally {
+            try {
+                if (reader != null) reader.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+        return data;
     }
 
     private void initBluetooth() {
@@ -202,7 +228,6 @@ public class MainActivity extends AppCompatActivity {
                     + "Please pair a Nonin BT device with this device.");
         }
     }
-
 
     public void showToast(String msg) {
         Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);

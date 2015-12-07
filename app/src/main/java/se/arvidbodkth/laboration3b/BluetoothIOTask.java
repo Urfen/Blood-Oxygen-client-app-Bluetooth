@@ -29,6 +29,7 @@ import java.util.UUID;
 
 /**
  * Created by arvidbodin on 07/12/15.
+ *
  */
 public class BluetoothIOTask extends AsyncTask<Void, String, String> {
 
@@ -62,23 +63,21 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
         String output = "";
 
         // an ongoing discovery will slow down the connection
-        adapter.cancelDiscovery();
-
-
-
-
+       /* adapter.cancelDiscovery();
         socket = null;
-        System.out.println(noninDevice.getName() + noninDevice);
+        System.out.println(noninDevice.getName() + noninDevice);*/
         try {
-            socket = noninDevice
+           /* socket = noninDevice
                     .createRfcommSocketToServiceRecord(STANDARD_SPP_UUID);
             socket.connect();
 
             is = socket.getInputStream();
-            os = socket.getOutputStream();
+            os = socket.getOutputStream();*/
 
-            while (!isCancelled() && i < 10) {
-                os.write(FORMAT);
+
+
+            while (!isCancelled() && i <= 100) {
+               /* os.write(FORMAT);
                 os.flush();
                 byte[] reply = new byte[1];
                 is.read(reply);
@@ -89,24 +88,24 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
                     is.read(frame);
                     int value1 = unsignedByteToInt(frame[1]);
                     int value2 = unsignedByteToInt(frame[2]);
-                    output ="Puls: " + value1 + " Syre:  " + value2 + "\r\n";
+                    //output ="Puls: " + value1 + " Syre:  " + value2 + "\r\n";*/
 
-
+                    output = Integer.toString(i) + "\n";
                     publishProgress(output);
                     i++;
-                }
+                //}
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try {
+           /* try {
                 os.close();
                 is.close();
                 if (socket != null)
                     socket.close();
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
         }
         return output;
     }
@@ -120,13 +119,13 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
     protected void onCancelled() {
         super.onCancelled();
 
-            try {
+          /*  try {
                 socket.close();
                 is.close();
                 os.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
 
     }
@@ -143,8 +142,7 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
         super.onPostExecute(output);
 
         activity.writeToFile();
-       // TcpTask tcpTask = new TcpTask();
-       // tcpTask.execute(s);
+
 
     }
 
