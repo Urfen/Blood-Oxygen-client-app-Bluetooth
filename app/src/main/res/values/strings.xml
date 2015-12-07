@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Laboration3b</string>
     <string name="action_settings">Settings</string>
+    <string name="data">Data...</string>
 </resources>

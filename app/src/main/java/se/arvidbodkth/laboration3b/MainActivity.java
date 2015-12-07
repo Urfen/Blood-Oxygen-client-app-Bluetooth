@@ -3,6 +3,7 @@ package se.arvidbodkth.laboration3b;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -30,11 +31,14 @@ public class MainActivity extends AppCompatActivity {
 
     private Button buttonStart, buttonStop;
     private ScrollView scrollView;
-    private TextView textView;
+    private TextView dataView;
     private EditText editText;
     private DataSender model;
 
-    private int i = 0;
+    public static final int REQUEST_ENABLE_BT = 42;
+    private BluetoothAdapter bluetoothAdapter = null;
+    private BluetoothDevice noninDevice = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +47,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        buttonStart = (Button) findViewById(R.id.buttonStart);
-        buttonStop = (Button) findViewById(R.id.buttonStop);
         editText = (EditText) findViewById(R.id.editText);
-        textView = (TextView) findViewById(R.id.textView);
+        dataView = (TextView) findViewById(R.id.textView);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
 
-        textView.addTextChangedListener(new TextWatcher() {
+        dataView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 scrollView.fullScroll(ScrollView.FOCUS_DOWN);
@@ -66,22 +68,96 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        buttonStart.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //BluetoothTask bluetoothTask = new BluetoothTask();
-                //bluetoothTask.execute();
-                textView.append(" " + i++ + "\n");
 
-            }
-        });
 
-        buttonStop.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
 
-            }
-        });
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            showToast("This device do not support Bluetooth");
+            this.finish();
+        }
 
     }
+
+
+
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        dataView.setText(R.string.data);
+        initBluetooth();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // TODO: stop ongoing BT communication
+    }
+
+    public void onPollButtonClicked(View view) {
+        if (noninDevice != null) {
+            new BluetoothIOTask(this, noninDevice).execute();
+        } else {
+            showToast("No Nonin sensor found");
+        }
+    }
+
+
+    protected void displayData(CharSequence data) {
+        dataView.setText(data);
+    }
+
+    private void initBluetooth() {
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(
+                    BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        } else {
+            getNoninDevice();
+        }
+    }
+
+    // callback for BluetoothAdapter.ACTION_REQUEST_ENABLE (called via
+    // initBluetooth)
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent result) {
+        super.onActivityResult(requestCode, resultCode, result);
+
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (bluetoothAdapter.isEnabled()) {
+                getNoninDevice();
+            } else {
+                showToast("Bluetooth is turned off.");
+            }
+        }
+    }
+
+    private void getNoninDevice() {
+        noninDevice = null;
+        Set<BluetoothDevice> pairedBTDevices = bluetoothAdapter
+                .getBondedDevices();
+        if (pairedBTDevices.size() > 0) {
+            // the last Nonin device, if any, will be selected...
+            for (BluetoothDevice device : pairedBTDevices) {
+                String name = device.getName();
+                if (name.contains("Nonin")) {
+                    noninDevice = device;
+                    showToast("Paired device: " + name);
+                    return;
+                }
+            }
+        }
+        if (noninDevice == null) {
+            showToast("No paired Nonin devices found!\r\n"
+                    + "Please pair a Nonin BT device with this device.");
+        }
+    }
+
+
+
+
     public void showToast(String msg) {
         Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
         toast.show();
@@ -110,68 +186,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private class BluetoothTask extends AsyncTask<Void, Void, String> {
 
-        private String NAME;
-        private UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-        private ArrayList<BluetoothDevice> arrayAdapter = new ArrayList<>();
-        private BluetoothSocket socket;
-        private InputStream in;
-        private OutputStream out;
-
-
-        @Override
-        protected String doInBackground(Void... params) {
-
-            //Anslut
-            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-            if (adapter != null) {
-            }
-
-            Set<BluetoothDevice> pairedDevices = adapter.getBondedDevices();
-
-            if (pairedDevices.size() > 0) {
-                for (BluetoothDevice device : pairedDevices) {
-                    // Show name and MAC address in a ListView
-                    arrayAdapter.add(device);
-                    NAME = device.getName();
-                    publishProgress();
-                }
-            }
-
-            try {
-
-                socket = arrayAdapter.get(0).createRfcommSocketToServiceRecord(MY_UUID);
-
-                //socket.connect();
-
-                //BluetoothIOTask bluetoothIOTask = new BluetoothIOTask()
-
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-
-
-            //Hämta BL data
-
-            //Spara data
-
-            return "Testtes123";
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-
-            TcpTask tcpTask = new TcpTask();
-            tcpTask.execute(s);
-
-        }
-    }
 }
 
