@@ -9,21 +9,55 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/editText"
-        android:hint="Enter Ip address"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:inputType="numberDecimal" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Connect"
-        android:id="@+id/button"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/editText"
-        android:layout_marginStart="16dp" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText"
+            android:hint="Enter Ip address"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:inputType="number|numberDecimal"
+            android:layout_gravity="left|top" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stop"
+            android:id="@+id/buttonStop"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="133dp"
+            android:layout_gravity="right|top" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start"
+            android:id="@+id/buttonStart"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="133dp"
+            android:layout_gravity="center_horizontal|top" />
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="40dp"
+            android:id="@+id/scrollView"
+            android:fillViewport="true"
+            android:layout_gravity="center" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView" />
+        </ScrollView>
+
+
+    </FrameLayout>
+
 </RelativeLayout>
