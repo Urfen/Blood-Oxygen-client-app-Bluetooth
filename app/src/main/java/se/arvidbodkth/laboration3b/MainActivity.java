@@ -121,8 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPollButtonClicked(View view) {
         if (noninDevice != null) {
-            bluetoothIOTask = new BluetoothIOTask(this, noninDevice,
-                    getApplicationContext());
+            bluetoothIOTask = new BluetoothIOTask(this, noninDevice);
             bluetoothIOTask.execute();
         } else {
             showToast("No Nonin sensor found");
