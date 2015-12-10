@@ -4,7 +4,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -20,7 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothDevice noninDevice = null;
     private BluetoothIOTask bluetoothIOTask;
 
-    private String fileName = "theData";
+    private File file;
+    FileWriter fileWriter;
+    BufferedWriter bufferedWriter;
 
 
     @Override
@@ -80,7 +86,12 @@ public class MainActivity extends AppCompatActivity {
             showToast("This device do not support Bluetooth");
             this.finish();
         }
+
+        //The data array.
         dataArray = new ArrayList<>();
+
+        //Create a public file.
+        file = new File(Environment.getExternalStorageDirectory(), "data.txt");
 
     }
 
@@ -107,81 +118,72 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPollButtonClicked(View view) {
 
-        bluetoothIOTask = new BluetoothIOTask(this, noninDevice, getApplicationContext());
-        bluetoothIOTask.execute();
-
-
         if (noninDevice != null) {
-
+            bluetoothIOTask = new BluetoothIOTask(this, noninDevice, getApplicationContext());
+            bluetoothIOTask.execute();
         } else {
             showToast("No Nonin sensor found");
         }
     }
 
     public void onStopButtonClicked(View view) {
-        //bluetoothIOTask.cancel(true);
+        bluetoothIOTask.cancel(true);
+
+        writeToFile();
+
+        System.out.println(file.getPath() +" Can write: "+ file.canWrite());
 
         TcpTask tcpTask = new TcpTask();
-        tcpTask.execute(readFromFile());
+
+        StringBuilder dataString = new StringBuilder();
+
+        for (int i = 0; i < dataArray.size(); i++) {
+            dataString.append(dataArray.get(i));
+        }
+
+        tcpTask.execute(dataString.toString());
 
     }
 
     protected void displayData(CharSequence data) {
-        dataView.append(data);
-        dataArray.add(data.toString());
+        String splitData = data.toString();
+        String[] splitedData = splitData.split(";");
+
+        dataView.append(splitedData[0] + "\n");
+        dataArray.add(splitedData[1] + ";");
     }
 
 
     public void writeToFile() {
+        showToast(" " + dataArray.size());
         if (dataArray.size() > 0) {
-            PrintWriter writer = null;
-            deleteFile(fileName);
+
             try {
-                OutputStream os = this.openFileOutput(fileName, MODE_APPEND);
-                writer = new PrintWriter(os);
-                writer.println(new Date().toString() + ";");
-                for (int i = 0; i < dataArray.size() ; i++) {
-                    writer.println(dataArray.get(i) + ";");
+                //open output outpus stream
+                fileWriter = new FileWriter(file);
+                bufferedWriter = new BufferedWriter(fileWriter);
+
+                for (int i = 0; i < dataArray.size(); i++) {
+                    bufferedWriter.write(dataArray.get(i));
                 }
+
+                showToast("Saved to file.");
+
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             } finally {
-                if (writer != null) writer.close();
+                if(bufferedWriter != null){
+                    try {
+                        bufferedWriter.close();
+                        fileWriter.close();
+                    }catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }
 
-    /**
-     * Reads the data from the local file then updates the
-     * arraylist and spinners with the data.
-     */
-    private String readFromFile() {
-        String data = "";
-        //Empty the list for the new data.
-        BufferedReader reader = null;
-        try {
-            InputStream is = this.openFileInput(fileName);
-            reader = new BufferedReader(new InputStreamReader(is));
-            String line = reader.readLine();
-
-            while (line != null) {
-                data += line;
-                System.out.println(line);
-                line = reader.readLine();
-            }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        //If the date-parsing fails.
-        finally {
-            try {
-                if (reader != null) reader.close();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
-        return data;
-    }
 
     private void initBluetooth() {
         if (!bluetoothAdapter.isEnabled()) {

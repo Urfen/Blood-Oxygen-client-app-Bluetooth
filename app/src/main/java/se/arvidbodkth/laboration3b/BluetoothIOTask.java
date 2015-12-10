@@ -29,14 +29,13 @@ import java.util.UUID;
 
 /**
  * Created by arvidbodin on 07/12/15.
- *
  */
 public class BluetoothIOTask extends AsyncTask<Void, String, String> {
 
     private static final UUID STANDARD_SPP_UUID = UUID
             .fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    private static final byte[] FORMAT = {0x44, 0x31};
+    private static final byte[] FORMAT = {0x02, 0x70, 0x04, 0x02, 0x02, 0x00, 0x78, 0x03};
     private static final byte ACK = 0x06; // ACK from Nonin sensor
 
     private MainActivity activity;
@@ -46,14 +45,13 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
     private InputStream is;
     private OutputStream os;
     private BluetoothSocket socket;
-    int i = 0;
 
-    public BluetoothIOTask(MainActivity activity, BluetoothDevice noninDevice, Context context){
+    public BluetoothIOTask(MainActivity activity, BluetoothDevice noninDevice, Context context) {
         this.context = context;
         this.activity = activity;
         this.noninDevice = noninDevice;
         this.adapter = BluetoothAdapter.getDefaultAdapter();
-        this.socket  = null;
+        this.socket = null;
 
     }
 
@@ -63,49 +61,68 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
         String output = "";
 
         // an ongoing discovery will slow down the connection
-       /* adapter.cancelDiscovery();
+        adapter.cancelDiscovery();
         socket = null;
-        System.out.println(noninDevice.getName() + noninDevice);*/
+        System.out.println(noninDevice.getName() + noninDevice);
         try {
-           /* socket = noninDevice
+            socket = noninDevice
                     .createRfcommSocketToServiceRecord(STANDARD_SPP_UUID);
             socket.connect();
 
             is = socket.getInputStream();
-            os = socket.getOutputStream();*/
+            os = socket.getOutputStream();
 
+            os.write(FORMAT);
+            os.flush();
+            byte[] reply = new byte[1];
+            is.read(reply);
 
+            //If the replay was an ack read the next frame.
+            if (reply[0] == ACK) {
 
-            while (!isCancelled() && i <= 100) {
-               /* os.write(FORMAT);
-                os.flush();
-                byte[] reply = new byte[1];
-                is.read(reply);
-
-                if (reply[0] == ACK) {
-                    byte[] frame = new byte[4]; // this -obsolete- format specifies
-                    // 4 bytes per frame
+                while (!isCancelled()) {
+                    //Send request for format.
+                    byte[] frame = new byte[5];
                     is.read(frame);
-                    int value1 = unsignedByteToInt(frame[1]);
-                    int value2 = unsignedByteToInt(frame[2]);
-                    //output ="Puls: " + value1 + " Syre:  " + value2 + "\r\n";*/
 
-                    output = Integer.toString(i) + "\n";
-                    publishProgress(output);
-                    i++;
-                //}
+                    //Get the plath value
+                    int pleth = unsignedByteToInt(frame[2]);
+
+                    //The resulution is 10bit so we need 2 bits from one byte.
+                    //If the bit 0 in the status byte is set to 1
+                    //read the next frame.
+                    if ((frame[1] & 0x01) == 1) {
+
+                        //Get the 2 LSB from the 4th frame
+                        byte mSB =  (byte)(frame[3] & 0x03);
+                        //Get the next frame
+                        is.read(frame);
+                        //Get all the bits in the next byte.
+                        byte lSB = (frame[3]);
+
+                        //Convert the bits to ints.
+                        int pulsMSB = unsignedByteToInt(mSB);
+                        int pulsLSB = unsignedByteToInt(lSB);
+
+                        int puls = pulsMSB*128 + pulsLSB;
+
+                        output = "Puls: " + puls + ";" + pleth;
+                        publishProgress(output);
+                    }
+
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-           /* try {
+            try {
                 os.close();
                 is.close();
                 if (socket != null)
                     socket.close();
             } catch (Exception e) {
                 e.printStackTrace();
-            }*/
+            }
         }
         return output;
     }
@@ -119,13 +136,13 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
     protected void onCancelled() {
         super.onCancelled();
 
-          /*  try {
-                socket.close();
-                is.close();
-                os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
+        try {
+            socket.close();
+            is.close();
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
     }
@@ -140,9 +157,6 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
     @Override
     protected void onPostExecute(String output) {
         super.onPostExecute(output);
-
-        activity.writeToFile();
-
 
     }
 

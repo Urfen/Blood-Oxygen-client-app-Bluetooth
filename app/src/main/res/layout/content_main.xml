@@ -9,57 +9,50 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
+        android:hint="Enter Ip address"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:inputType="number|numberDecimal"
+        android:layout_gravity="left|top"
+        android:layout_toStartOf="@+id/buttonStart" />
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/editText"
-            android:hint="Enter Ip address"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:inputType="number|numberDecimal"
-            android:layout_gravity="left|top" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+        android:id="@+id/buttonStop"
+        android:onClick="onStopButtonClicked"
+        android:layout_gravity="right|top"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Stop"
-            android:id="@+id/buttonStop"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="133dp"
-            android:onClick="onStopButtonClicked"
-            android:layout_gravity="right|top" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:onClick="onPollButtonClicked"
+        android:id="@+id/buttonStart"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/buttonStop" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start"
-            android:onClick="onPollButtonClicked"
-            android:id="@+id/buttonStart"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="133dp"
-            android:layout_gravity="center_horizontal|top" />
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="300dp"
+        android:id="@+id/scrollView"
+        android:fillViewport="true"
+        android:layout_gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/editText">
 
-        <ScrollView
+        <TextView
             android:layout_width="fill_parent"
-            android:layout_height="300dp"
-            android:layout_marginTop="40dp"
-            android:id="@+id/scrollView"
-            android:fillViewport="true"
-            android:layout_gravity="center" >
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textView" />
-        </ScrollView>
-
-
-    </FrameLayout>
+            android:layout_height="wrap_content"
+            android:id="@+id/textView" />
+    </ScrollView>
 
 </RelativeLayout>

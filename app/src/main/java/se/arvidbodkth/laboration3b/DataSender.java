@@ -23,7 +23,8 @@ public class DataSender {
     private Socket socket;
 
     public DataSender(String data){
-        ipAddress = "192.168.0.14";
+        //ipAddress = "192.168.0.14";
+        ipAddress = "130.229.183.203";
         this.data = data;
     }
 
