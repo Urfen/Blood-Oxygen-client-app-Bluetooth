@@ -36,10 +36,9 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button buttonStart, buttonStop;
+    private Button buttonStart, buttonStop, sendButton;
     private ScrollView scrollView;
     private TextView dataView;
-    private EditText editText;
     private DataSender model;
     private File dataFile;
 
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        editText = (EditText) findViewById(R.id.editText);
+
         dataView = (TextView) findViewById(R.id.textView);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
 
@@ -82,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
         if (bluetoothAdapter == null) {
             showToast("This device do not support Bluetooth");
             this.finish();
@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Create a public file.
         file = new File(Environment.getExternalStorageDirectory(), "data.txt");
+
+        openFileWriter();
 
     }
 
@@ -116,8 +118,20 @@ public class MainActivity extends AppCompatActivity {
         // TODO: stop ongoing BT communication
     }
 
-    public void onPollButtonClicked(View view) {
 
+    public void onSendButtonClicked(View view){
+        //Init the tcp task
+        TcpTask tcpTask = new TcpTask();
+
+        StringBuilder dataString = new StringBuilder();
+        for (int i = 0; i < dataArray.size(); i++) {
+            dataString.append(dataArray.get(i));
+        }
+
+        tcpTask.execute(dataString.toString());
+    }
+
+    public void onPollButtonClicked(View view) {
         if (noninDevice != null) {
             bluetoothIOTask = new BluetoothIOTask(this, noninDevice, getApplicationContext());
             bluetoothIOTask.execute();
@@ -129,20 +143,7 @@ public class MainActivity extends AppCompatActivity {
     public void onStopButtonClicked(View view) {
         bluetoothIOTask.cancel(true);
 
-        writeToFile();
-
-        System.out.println(file.getPath() +" Can write: "+ file.canWrite());
-
-        TcpTask tcpTask = new TcpTask();
-
-        StringBuilder dataString = new StringBuilder();
-
-        for (int i = 0; i < dataArray.size(); i++) {
-            dataString.append(dataArray.get(i));
-        }
-
-        tcpTask.execute(dataString.toString());
-
+        closeFileWriter();
     }
 
     protected void displayData(CharSequence data) {
@@ -151,36 +152,37 @@ public class MainActivity extends AppCompatActivity {
 
         dataView.append(splitedData[0] + "\n");
         dataArray.add(splitedData[1] + ";");
+        writeToFile(splitedData[1] + "\n");
     }
 
+    public void openFileWriter() {
+        try {
+            //open output outpus stream
+            fileWriter = new FileWriter(file);
+            bufferedWriter = new BufferedWriter(fileWriter);
 
-    public void writeToFile() {
-        showToast(" " + dataArray.size());
-        if (dataArray.size() > 0) {
+            bufferedWriter.write(new Date().toString() + "\n");
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
 
+    public void closeFileWriter() {
+        if (bufferedWriter != null) {
             try {
-                //open output outpus stream
-                fileWriter = new FileWriter(file);
-                bufferedWriter = new BufferedWriter(fileWriter);
-
-                for (int i = 0; i < dataArray.size(); i++) {
-                    bufferedWriter.write(dataArray.get(i));
-                }
-
-                showToast("Saved to file.");
-
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            } finally {
-                if(bufferedWriter != null){
-                    try {
-                        bufferedWriter.close();
-                        fileWriter.close();
-                    }catch (IOException e){
-                        e.printStackTrace();
-                    }
-                }
+                bufferedWriter.close();
+                fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+        }
+    }
+
+    public void writeToFile(String data) {
+        try {
+            bufferedWriter.write(data);
+        }catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

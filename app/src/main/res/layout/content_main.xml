@@ -9,17 +9,6 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/editText"
-        android:hint="Enter Ip address"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:inputType="number|numberDecimal"
-        android:layout_gravity="left|top"
-        android:layout_toStartOf="@+id/buttonStart" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -28,7 +17,7 @@
         android:onClick="onStopButtonClicked"
         android:layout_gravity="right|top"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -38,7 +27,7 @@
         android:id="@+id/buttonStart"
         android:layout_gravity="center_horizontal|top"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/buttonStop" />
+        android:layout_alignParentStart="true" />
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -46,13 +35,21 @@
         android:id="@+id/scrollView"
         android:fillViewport="true"
         android:layout_gravity="center"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/editText">
+        android:layout_alignParentBottom="true">
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textView" />
     </ScrollView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:id="@+id/button"
+        android:layout_alignBottom="@+id/buttonStop"
+        android:layout_alignParentEnd="true"
+        android:onClick="onSendButtonClicked"/>
 
 </RelativeLayout>
