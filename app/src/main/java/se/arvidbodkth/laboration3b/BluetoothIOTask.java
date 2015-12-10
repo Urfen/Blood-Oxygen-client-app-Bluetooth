@@ -5,49 +5,33 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
-
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 
 /**
  * Created by arvidbodin on 07/12/15.
+ *
  */
 public class BluetoothIOTask extends AsyncTask<Void, String, String> {
 
     private static final UUID STANDARD_SPP_UUID = UUID
             .fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    private static final byte[] FORMAT = {0x02, 0x70, 0x04, 0x02, 0x02, 0x00, 0x78, 0x03};
+    private static final byte[] FORMAT =
+            {0x02, 0x70, 0x04, 0x02, 0x02, 0x00, 0x78, 0x03};
     private static final byte ACK = 0x06; // ACK from Nonin sensor
 
     private MainActivity activity;
     private BluetoothDevice noninDevice;
     private BluetoothAdapter adapter;
-    private Context context;
     private InputStream is;
     private OutputStream os;
     private BluetoothSocket socket;
 
-    public BluetoothIOTask(MainActivity activity, BluetoothDevice noninDevice, Context context) {
-        this.context = context;
+    public BluetoothIOTask(MainActivity activity,
+                           BluetoothDevice noninDevice) {
         this.activity = activity;
         this.noninDevice = noninDevice;
         this.adapter = BluetoothAdapter.getDefaultAdapter();

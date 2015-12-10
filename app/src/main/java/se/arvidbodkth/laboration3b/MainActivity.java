@@ -2,45 +2,32 @@ package se.arvidbodkth.laboration3b;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button buttonStart, buttonStop, sendButton;
     private ScrollView scrollView;
     private TextView dataView;
-    private DataSender model;
-    private File dataFile;
 
     private ArrayList<String> dataArray;
 
@@ -91,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
         dataArray = new ArrayList<>();
 
         //Create a public file.
-        file = new File(Environment.getExternalStorageDirectory(), "data.txt");
+        file = new File(Environment.getExternalStorageDirectory(),
+                "data.txt");
 
         openFileWriter();
 
@@ -133,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPollButtonClicked(View view) {
         if (noninDevice != null) {
-            bluetoothIOTask = new BluetoothIOTask(this, noninDevice, getApplicationContext());
+            bluetoothIOTask = new BluetoothIOTask(this, noninDevice,
+                    getApplicationContext());
             bluetoothIOTask.execute();
         } else {
             showToast("No Nonin sensor found");
