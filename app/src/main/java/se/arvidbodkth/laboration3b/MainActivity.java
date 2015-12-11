@@ -126,16 +126,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPollButtonClicked(View view) {
         if (noninDevice != null) {
-           // bluetoothIOTask = new BluetoothIOTask(this, noninDevice);
-           // bluetoothIOTask.execute();
+            bluetoothIOTask = new BluetoothIOTask(this, noninDevice);
+            bluetoothIOTask.execute();
         } else {
             showToast("No Nonin sensor found");
 
-
-
-            dataArray.add(String.valueOf(i++));
-
-            displayData(String.valueOf(i));
+            //dataArray.add(String.valueOf(i++));
+            //displayData(String.valueOf(i));
         }
     }
 
@@ -152,8 +149,8 @@ public class MainActivity extends AppCompatActivity {
         String[] splitedData = splitData.split(";");
 
         dataView.append(splitedData[0] + "\n");
-        dataArray.add(splitedData[0] + ";");
-        writeToFile(splitedData[0] + "\n");
+        dataArray.add(splitedData[1] + ";");
+        writeToFile(splitedData[1] + "\n");
     }
 
     public void openFileWriter() {
@@ -180,13 +177,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void writeToFile(String data) {
-        if (bufferedWriter != null)openFileWriter();
 
-        if(bufferedWriter != null) {
+            if(bufferedWriter != null) {
             try {
                 bufferedWriter.write(data);
             } catch (IOException e) {
-                e.printStackTrace();
+                openFileWriter();
+                try {
+                    bufferedWriter.write(data);
+                }catch (IOException io){
+                    e.printStackTrace();
+                }
+
             }
         }
     }
