@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     FileWriter fileWriter;
     BufferedWriter bufferedWriter;
 
+    private  int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,13 +97,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bluetoothIOTask.cancel(true);
+        if(bluetoothIOTask != null) {
+            bluetoothIOTask.cancel(true);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        bluetoothIOTask.cancel(true);
+        if(bluetoothIOTask != null) {
+            bluetoothIOTask.cancel(true);
+        }
         // TODO: stop ongoing BT communication
     }
 
@@ -121,15 +126,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPollButtonClicked(View view) {
         if (noninDevice != null) {
-            bluetoothIOTask = new BluetoothIOTask(this, noninDevice);
-            bluetoothIOTask.execute();
+           // bluetoothIOTask = new BluetoothIOTask(this, noninDevice);
+           // bluetoothIOTask.execute();
         } else {
             showToast("No Nonin sensor found");
+
+
+
+            dataArray.add(String.valueOf(i++));
+
+            displayData(String.valueOf(i));
         }
     }
 
     public void onStopButtonClicked(View view) {
-        bluetoothIOTask.cancel(true);
+        if(bluetoothIOTask != null) {
+            bluetoothIOTask.cancel(true);
+        }
 
         closeFileWriter();
     }
@@ -139,8 +152,8 @@ public class MainActivity extends AppCompatActivity {
         String[] splitedData = splitData.split(";");
 
         dataView.append(splitedData[0] + "\n");
-        dataArray.add(splitedData[1] + ";");
-        writeToFile(splitedData[1] + "\n");
+        dataArray.add(splitedData[0] + ";");
+        writeToFile(splitedData[0] + "\n");
     }
 
     public void openFileWriter() {
@@ -167,10 +180,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void writeToFile(String data) {
-        try {
-            bufferedWriter.write(data);
-        }catch (IOException e) {
-            e.printStackTrace();
+        if (bufferedWriter != null)openFileWriter();
+
+        if(bufferedWriter != null) {
+            try {
+                bufferedWriter.write(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
