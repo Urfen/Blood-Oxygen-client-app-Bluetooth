@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     private  int i = 0;
 
+
+    //Initialize UI and components, set
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    //Initialize the bluetooth
     @Override
     protected void onStart() {
         super.onStart();
@@ -94,9 +96,11 @@ public class MainActivity extends AppCompatActivity {
         initBluetooth();
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //Turns off the bluetooth
         if(bluetoothIOTask != null) {
             bluetoothIOTask.cancel(true);
         }
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        //Turns off the bluetooth
         if(bluetoothIOTask != null) {
             bluetoothIOTask.cancel(true);
         }
@@ -112,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //Sends the data to the server if the send button is pressed
     public void onSendButtonClicked(View view){
         //Init the tcp task
         TcpTask tcpTask = new TcpTask();
@@ -124,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
         tcpTask.execute(dataString.toString());
     }
 
+    //Execute background task to get data from bluetooth device, on button pressed
     public void onPollButtonClicked(View view) {
         if (noninDevice != null) {
             bluetoothIOTask = new BluetoothIOTask(this, noninDevice);
@@ -136,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Stops the datatransfer from bluetooth, turns bluetooth off
     public void onStopButtonClicked(View view) {
         if(bluetoothIOTask != null) {
             bluetoothIOTask.cancel(true);
@@ -155,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void openFileWriter() {
         try {
-            //open output outpus stream
+            //open output stream
             fileWriter = new FileWriter(file);
             bufferedWriter = new BufferedWriter(fileWriter);
 
