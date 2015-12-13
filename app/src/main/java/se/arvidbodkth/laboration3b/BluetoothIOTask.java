@@ -3,7 +3,6 @@ package se.arvidbodkth.laboration3b;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.os.AsyncTask;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,9 +39,11 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
     }
 
     /**
-     * Runs in a separate thread.
-     * @param v
-     * @return
+     * Runs in a separate thread. Sets up the BL-socket
+     * input and outputStreams. Sends a format string then
+     * receives data.
+     * @param v nothing.
+     * @return the output.
      */
     @Override
     protected String doInBackground(Void... v) {
@@ -60,12 +61,15 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
             is = socket.getInputStream();
             os = socket.getOutputStream();
 
+            //Set the format to Data fromat 2.
             os.write(FORMAT);
             os.flush();
+
+            //Gets the replay (ACK/NACK)
             byte[] reply = new byte[1];
             is.read(reply);
 
-            //If the replay was an ack read the next frame.
+            //If the replay was an ACK read the next frame.
             if (reply[0] == ACK) {
 
                 while (!isCancelled()) {
@@ -115,11 +119,19 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
         return output;
     }
 
-
+    /**
+     * Converts unsigned byte to an int.
+     * @param b the byte to convert.
+     * @return the int.
+     */
     private int unsignedByteToInt(byte b) {
         return (int) b & 0xFF;
     }
 
+    /**
+     * Stops the thread, socket and the
+     * I/O streams.
+     */
     @Override
     protected void onCancelled() {
         super.onCancelled();
@@ -135,6 +147,11 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
 
     }
 
+    /**
+     * When called it updetes the data on the screen
+     * and in the dataArray in MainActivity.
+     * @param values output.
+     */
     @Override
     protected void onProgressUpdate(String... values) {
         super.onProgressUpdate(values);
@@ -142,6 +159,11 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
 
     }
 
+    /**
+     * When the thread is done it updates the
+     * the dusplay one last time.
+     * @param output the data output.
+     */
     @Override
     protected void onPostExecute(String output) {
         super.onPostExecute(output);
