@@ -193,7 +193,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Creates the BL adapter.
+     */
     private void initBluetooth() {
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(
@@ -219,6 +221,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Gets the paired the devices. If one of the
+     * devices has the name "nonon" it connects to it.
+     */
     private void getNoninDevice() {
         noninDevice = null;
         Set<BluetoothDevice> pairedBTDevices = bluetoothAdapter
@@ -240,11 +246,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Show a toast to the user with a given message.
+     * @param msg the message to show the user.
+     */
     public void showToast(String msg) {
         Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
         toast.show();
     }
 
+    /**
+     * Creates the options menu. "Not used"
+     * @param menu menu XML
+     * @return true;
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -252,6 +267,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * When the item in the settings menu is hit.
+     * @param item the item ID.
+     * @return ?
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
