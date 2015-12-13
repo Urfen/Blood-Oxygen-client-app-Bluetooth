@@ -43,7 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private  int i = 0;
 
 
-    //Initialize UI and components, set
+    /**
+     * Initialize UI and components, set
+     * @param savedInstanceState state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,7 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Initialize the bluetooth
+    /**
+     * Initialize the bluetooth
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -96,7 +101,9 @@ public class MainActivity extends AppCompatActivity {
         initBluetooth();
     }
 
-
+    /**
+     * If there is a task runnig, stop it.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -106,6 +113,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * If there is a task runnig, stop it.
+     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -117,7 +127,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Sends the data to the server if the send button is pressed
+    /**
+     * Sends the data to the server if the send button is pressed
+     * @param view the view for the button.
+     */
     public void onSendButtonClicked(View view){
         //Init the tcp task
         TcpTask tcpTask = new TcpTask();
@@ -130,7 +143,10 @@ public class MainActivity extends AppCompatActivity {
         tcpTask.execute(dataString.toString());
     }
 
-    //Execute background task to get data from bluetooth device, on button pressed
+    /**
+     * Execute background task to get data from bluetooth device, on button pressed
+     * @param view the view for the button
+     */
     public void onPollButtonClicked(View view) {
         if (noninDevice != null) {
             bluetoothIOTask = new BluetoothIOTask(this, noninDevice);
@@ -143,7 +159,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Stops the datatransfer from bluetooth, turns bluetooth off
+    /**
+     * Stops the datatransfer from bluetooth, turns bluetooth off
+     * @param view the view for the button
+     */
     public void onStopButtonClicked(View view) {
         if(bluetoothIOTask != null) {
             bluetoothIOTask.cancel(true);
@@ -152,6 +171,10 @@ public class MainActivity extends AppCompatActivity {
         closeFileWriter();
     }
 
+    /**
+     * Adds the new data to the display and saves the pleth.
+     * @param data new data.
+     */
     protected void displayData(CharSequence data) {
         String splitData = data.toString();
         String[] splitedData = splitData.split(";");
@@ -161,6 +184,9 @@ public class MainActivity extends AppCompatActivity {
         writeToFile(splitedData[1] + "\n");
     }
 
+    /**
+     * Creates the fileWriter.
+     */
     public void openFileWriter() {
         try {
             //open output stream
@@ -173,6 +199,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Colses the fileWriter.
+     */
     public void closeFileWriter() {
         if (bufferedWriter != null) {
             try {
@@ -184,6 +213,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Writes data to the file.
+     * @param data the data to write.
+     */
     public void writeToFile(String data) {
 
             if(bufferedWriter != null) {
@@ -214,8 +247,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // callback for BluetoothAdapter.ACTION_REQUEST_ENABLE (called via
-    // initBluetooth)
+    /**
+     * Checks if the bluetooth is turned on or not, if it is
+     * it gets the noine device.
+     * @param requestCode requestCode
+     * @param resultCode resultCode
+     * @param result result
+     */
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent result) {
         super.onActivityResult(requestCode, resultCode, result);
