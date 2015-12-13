@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 /**
- * Created by arvidbodin on 07/12/15.
+ * Created by Arvid Bodin och Mattias Grehnik on 2015-12-06.
  *
  */
 public class BluetoothIOTask extends AsyncTask<Void, String, String> {
@@ -39,7 +39,11 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
 
     }
 
-
+    /**
+     * Runs in a separate thread.
+     * @param v
+     * @return
+     */
     @Override
     protected String doInBackground(Void... v) {
         String output = "";

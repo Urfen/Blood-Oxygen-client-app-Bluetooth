@@ -20,6 +20,10 @@ public class DataSender {
         this.data = data;
     }
 
+    /**
+     * Sets up a socket to a given ip and sends the
+     * data string.
+     */
     public void sendData(){
         try{
             Socket socket = new Socket(ipAddress, port);
