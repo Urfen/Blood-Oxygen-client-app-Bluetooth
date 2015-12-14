@@ -79,6 +79,7 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
 
                     //Get the plath value
                     int pleth = unsignedByteToInt(frame[2]);
+                    publishProgress(""+pleth);
 
                     //The resulution is 10bit so we need 2 bits from one byte.
                     //If the bit 0 in the status byte is set to 1
@@ -98,8 +99,8 @@ public class BluetoothIOTask extends AsyncTask<Void, String, String> {
 
                         int puls = pulsMSB*128 + pulsLSB;
 
-                        output = "Puls: " + puls + ";" + pleth;
-                        publishProgress(output);
+                        //output = "Puls: " + puls + ";" + pleth;
+
                     }
 
                 }

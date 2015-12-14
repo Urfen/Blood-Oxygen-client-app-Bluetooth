@@ -177,11 +177,11 @@ public class MainActivity extends AppCompatActivity {
      */
     protected void displayData(CharSequence data) {
         String splitData = data.toString();
-        String[] splitedData = splitData.split(";");
+        //String[] splitedData = splitData.split(";");
 
-        dataView.append(splitedData[0] + "\n");
-        dataArray.add(splitedData[1] + ";");
-        writeToFile(splitedData[1] + "\n");
+        dataView.append(splitData + "\n");
+        dataArray.add(splitData + ";");
+        //writeToFile(splitedData[1] + "\n");
     }
 
     /**

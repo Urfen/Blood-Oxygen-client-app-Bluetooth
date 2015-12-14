@@ -15,8 +15,8 @@ public class DataSender {
     private String data;
 
     public DataSender(String data){
-        ipAddress = "192.168.0.14";
-        //ipAddress = "130.229.183.203";
+        //ipAddress = "192.168.0.14";
+        ipAddress = "130.229.145.64";
         this.data = data;
     }
 
